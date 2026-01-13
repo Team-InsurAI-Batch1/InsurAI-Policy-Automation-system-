@@ -8,10 +8,14 @@ services:
     container_name: insurai-backend
     ports:
       - "9000:8080"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db.txkgemcpojqaqzjyrfrr.supabase.co:5432/postgres?sslmode=require
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: root@insurai
+      SPRING_DATASOURCE_URL: jdbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:6543/postgres?user=postgres.txkgemcpojqaqzjyrfrr&password=FQuy0qTYMyY38tST
+      SPRING_DATASOURCE_USERNAME: postgres.txkgemcpojqaqzjyrfrr
+      SPRING_DATASOURCE_PASSWORD: FQuy0qTYMyY38tST
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       JAVA_TOOL_OPTIONS: "-Djava.net.preferIPv4Stack=true"
 
