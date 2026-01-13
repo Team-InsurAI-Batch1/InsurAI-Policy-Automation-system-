@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/agent")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://insurai-automation-system.netlify.app")
 public class AgentController {
 
     private final AgentService agentService;

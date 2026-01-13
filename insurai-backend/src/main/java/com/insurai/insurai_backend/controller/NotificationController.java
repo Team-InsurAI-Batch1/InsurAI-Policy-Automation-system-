@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.insurai.insurai_backend.model.Notification;
 import com.insurai.insurai_backend.service.InAppNotificationService;
 
-@CrossOrigin(origins = "http://localhost:3000") // Enable CORS for React frontend
+@CrossOrigin(origins = "https://insurai-automation-system.netlify.app") // Enable CORS for React frontend
 @RestController
 @RequestMapping("/notifications")
 public class NotificationController {

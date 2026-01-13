@@ -25,7 +25,7 @@ import com.insurai.insurai_backend.service.PolicyService;
 
 @RestController
 @RequestMapping("/admin")
-@CrossOrigin(origins = "http://localhost:5173") // React frontend
+@CrossOrigin(origins = "https://insurai-automation-system.netlify.app") // React frontend
 public class AdminController {
 
     @Autowired

@@ -28,7 +28,7 @@ import com.insurai.insurai_backend.service.EmployeeQueryService;
 
 @RestController
 @RequestMapping("/employee")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://insurai-automation-system.netlify.app")
 public class EmployeeQueryController {
 
     @Autowired

@@ -34,7 +34,7 @@ import jakarta.annotation.PostConstruct;
 
 @RestController
 @RequestMapping("/employee/chatbot")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = "https://insurai-automation-system.netlify.app", allowCredentials = "true")
 public class ChatbotController {
 
     @Value("${COHERE_API_KEY:}")

@@ -118,7 +118,7 @@ public class EmployeeService {
         employeeRepository.save(emp);
 
         // Construct frontend reset password link (HashRouter-friendly)
-        String resetLink = "http://localhost:5173/#/employee/reset-password/" + token;
+        String resetLink = "https://insurai-automation-system.netlify.app/#/employee/reset-password/" + token;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(emp.getEmail());

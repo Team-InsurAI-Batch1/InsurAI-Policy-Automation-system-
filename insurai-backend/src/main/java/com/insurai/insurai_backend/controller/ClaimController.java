@@ -33,7 +33,7 @@ import com.insurai.insurai_backend.service.ClaimService;
 
 @RestController
 @RequestMapping("/employee/claims")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = "https://insurai-automation-system.netlify.app", allowCredentials = "true")
 public class ClaimController {
 
     @Autowired

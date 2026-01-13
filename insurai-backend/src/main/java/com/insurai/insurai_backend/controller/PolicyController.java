@@ -26,7 +26,7 @@ import com.insurai.insurai_backend.service.PolicyService;
 
 @RestController
 @RequestMapping("/admin/policies")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = "https://insurai-automation-system.netlify.app", allowCredentials = "true")
 public class PolicyController {
 
     private final PolicyService policyService;
