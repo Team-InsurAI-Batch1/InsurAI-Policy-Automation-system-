@@ -35,7 +35,7 @@ public interface ClaimRepository extends JpaRepository<Claim, Long> {
     List<Claim> findByEmployee_EmployeeIdAndStatus(String employeeId, String status);
 
     // Get all claims assigned to a specific HR
-    List<Claim> findByAssignedHrId(Long hrId);
+    List<Claim> findByAssignedHr_Id(Long hrId);
 
     // Count pending claims for a specific HR
     int countByAssignedHrAndStatus(Hr hr, String status);
@@ -48,7 +48,7 @@ public interface ClaimRepository extends JpaRepository<Claim, Long> {
     @Query("SELECT c FROM Claim c LEFT JOIN FETCH c.assignedHr")
     List<Claim> findAllWithHrDetails();
 
-    List<Claim> findByAssignedHrIdAndFraudFlag(Long hrId, boolean fraudFlag);
+    List<Claim> findByAssignedHr_IdAndFraudFlag(Long hrId, boolean fraudFlag);
 
 }
 

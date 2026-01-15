@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -93,7 +94,7 @@ public class Claim {
         this.employee = employee;
         this.policy = policy;
         this.assignedHr = assignedHr;
-        this.documents = documents;
+        this.documents = List.of();
     }
 
     // Getters and Setters

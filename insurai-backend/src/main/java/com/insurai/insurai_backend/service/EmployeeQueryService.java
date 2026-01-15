@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,7 +66,7 @@ public class EmployeeQueryService {
         return savedQuery;
     }
 
-    // -------------------- Respond to a query (agent) --------------------
+    // -------------------- Respond to a query (agent) - TEMPORARY: back to sync for debugging --------------------
     @Transactional
     public EmployeeQuery respondToQuery(Long agentId, Long queryId, String response) throws Exception {
         EmployeeQuery query = queryRepository.findById(queryId)
@@ -84,25 +85,20 @@ public class EmployeeQueryService {
         EmployeeQuery savedQuery = queryRepository.saveAndFlush(query);
         System.out.println("✅ Query saved and flushed: ID=" + savedQuery.getId() + ", Status=" + savedQuery.getStatus());
 
-        // ✅ Double-check from DB
-        EmployeeQuery reloaded = queryRepository.findById(queryId)
-                .orElseThrow(() -> new Exception("Query not found after saving"));
-        System.out.println("🧾 DB Verification - Query ID=" + reloaded.getId() + ", Status=" + reloaded.getStatus());
-
-        // ✅ Send email after confirming DB update
+        // ✅ Send notification synchronously for debugging
         try {
-            if (reloaded.getEmployee() != null && reloaded.getEmployee().getEmail() != null) {
-                notificationService.sendAgentResponseNotificationToEmployee(reloaded.getEmployee().getEmail(), reloaded);
-                System.out.println("📧 Email sent successfully to " + reloaded.getEmployee().getEmail());
+            if (savedQuery.getEmployee() != null && savedQuery.getEmployee().getEmail() != null) {
+                notificationService.sendAgentResponseNotificationToEmployee(savedQuery.getEmployee().getEmail(), savedQuery);
+                System.out.println("📧 Email sent successfully to " + savedQuery.getEmployee().getEmail());
             }
         } catch (Exception e) {
             System.err.println("❌ Failed to send agent response notification: " + e.getMessage());
         }
 
-        return reloaded;
+        return savedQuery;
     }
 
-    // -------------------- Respond to a query without agentId --------------------
+    // -------------------- Respond to a query without agentId - TEMPORARY: back to sync for debugging --------------------
     @Transactional
     public EmployeeQuery respondToQuery(EmployeeQuery query, String response) throws Exception {
         if (query == null) throw new Exception("Query cannot be null");
@@ -114,7 +110,7 @@ public class EmployeeQueryService {
         EmployeeQuery savedQuery = queryRepository.saveAndFlush(query);
         System.out.println("✅ Query (no-agent) saved and flushed. ID=" + savedQuery.getId());
 
-        // Notify employee
+        // Send notification synchronously for debugging
         try {
             if (savedQuery.getEmployee() != null && savedQuery.getEmployee().getEmail() != null) {
                 notificationService.sendAgentResponseNotificationToEmployee(savedQuery.getEmployee().getEmail(), savedQuery);

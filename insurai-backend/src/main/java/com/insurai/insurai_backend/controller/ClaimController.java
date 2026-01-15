@@ -161,6 +161,9 @@ public ResponseEntity<?> updateClaim(
                     .collect(Collectors.toList());
             claim.getDocuments().addAll(documentPaths);
         }
+        else {
+            claim.setDocuments(List.of());
+        }
 
         Claim updatedClaim = claimService.updateClaim(claim);
 

@@ -216,9 +216,73 @@ const AdminAllClaims = ({ claims = [] }) => {
   const handleBulkAction = async (action) => {
     if (!action || selectedClaims.length === 0) return;
     
-    // Implement bulk actions here
-    console.log(`Performing ${action} on claims:`, selectedClaims);
-    
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Authentication required. Please login again.');
+      return;
+    }
+
+    try {
+      let completedCount = 0;
+      let failedCount = 0;
+
+      for (const claimId of selectedClaims) {
+        try {
+          let endpoint = '';
+          let method = 'POST';
+
+          switch (action) {
+            case 'approve':
+              endpoint = `https://insurai-policy-automation-system-backend.onrender.com/hr/claims/approve/${claimId}`;
+              break;
+            case 'reject':
+              endpoint = `https://insurai-policy-automation-system-backend.onrender.com/hr/claims/reject/${claimId}`;
+              break;
+            case 'export':
+              // Export doesn't need API call, skip
+              continue;
+            case 'assign':
+              // Assign requires HR selection, skip in bulk
+              continue;
+            default:
+              continue;
+          }
+
+          const response = await fetch(endpoint, {
+            method: method,
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ remarks: `Bulk ${action} action` })
+          });
+
+          if (response.ok) {
+            completedCount++;
+          } else {
+            failedCount++;
+            console.error(`Failed to ${action} claim ${claimId}:`, response.statusText);
+          }
+        } catch (error) {
+          failedCount++;
+          console.error(`Error ${action} claim ${claimId}:`, error);
+        }
+      }
+
+      // Show results
+      let message = `${action.charAt(0).toUpperCase() + action.slice(1)} completed for ${completedCount} claim(s)`;
+      if (failedCount > 0) {
+        message += ` | Failed: ${failedCount}`;
+      }
+      alert(message);
+
+      // Reload claims or refresh page
+      window.location.reload();
+    } catch (error) {
+      console.error('Bulk action error:', error);
+      alert('Error performing bulk action. Please try again.');
+    }
+
     // Reset selection
     setSelectedClaims([]);
     setBulkAction("");

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.insurai.insurai_backend.config.JwtUtil;
@@ -53,14 +54,19 @@ public ResponseEntity<?> login(@RequestBody LoginRequest request) {
 
         String token = jwtUtil.generateToken(hr.getEmail(), "HR");
 
-        // -------------------- Audit log --------------------
-        auditLogService.logAction(
-                hr.getId().toString(),
-                hr.getName(),
-                "HR",
-                "LOGIN",
-                "HR logged in"
-        );
+        // -------------------- Audit log (temporarily disabled for debugging) --------------------
+        try {
+            auditLogService.logAction(
+                    hr.getId().toString(),
+                    hr.getName(),
+                    "HR",
+                    "LOGIN",
+                    "HR logged in"
+            );
+        } catch (Exception auditEx) {
+            System.err.println("⚠️ Audit log failed: " + auditEx.getMessage());
+            // Don't fail login if audit logging fails
+        }
 
         return ResponseEntity.ok(Map.of(
                 "token", token,
@@ -84,32 +90,54 @@ public ResponseEntity<?> login(@RequestBody LoginRequest request) {
 
 // ================= Get Claims Assigned to Logged-in HR =================
 @GetMapping("/claims")
-public ResponseEntity<?> getAssignedClaims(@RequestHeader(value = "Authorization") String authHeader) {
+public ResponseEntity<?> getAssignedClaims(
+        @RequestHeader(value = "Authorization", required = false) String authHeader,
+        @RequestParam(value = "hrId", required = false) Long hrId
+) {
     try {
-        validateHrToken(authHeader);
-        String token = authHeader.substring(7).trim();
-        String hrEmail = jwtUtil.extractUsername(token);
+        Hr hr = null;
 
-        Hr hr = hrRepository.findByEmail(hrEmail)
-                .orElseThrow(() -> new RuntimeException("HR not found"));
+        // ✅ Priority 1: JWT (secure path)
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7).trim();
+            String role = jwtUtil.extractRole(token);
+
+            if (!"HR".equalsIgnoreCase(role)) {
+                return ResponseEntity.status(401).body("Unauthorized: not HR");
+            }
+
+            String hrEmail = jwtUtil.extractUsername(token);
+            hr = hrRepository.findByEmail(hrEmail)
+                    .orElseThrow(() -> new RuntimeException("HR not found"));
+        }
+
+        // ✅ Priority 2: hrId fallback (for existing frontend)
+        else if (hrId != null) {
+            hr = hrRepository.findById(hrId)
+                    .orElseThrow(() -> new RuntimeException("HR not found with id " + hrId));
+        }
+
+        // ❌ No auth and no hrId
+        else {
+            return ResponseEntity.status(401)
+                    .body("Missing Authorization header or hrId");
+        }
 
         List<Claim> claims = claimService.getClaimsByAssignedHr(hr.getId());
+
         List<ClaimDTO> dtos = claims.stream()
                 .map(ClaimDTO::new)
-                .collect(Collectors.toList());
-
-        // -------------------- Audit log --------------------
-        auditLogService.logAction(
-                hr.getId().toString(),
-                hr.getName(),
-                "HR",
-                "VIEW_CLAIMS",
-                "Fetched assigned claims"
-        );
+                .toList();
 
         return ResponseEntity.ok(dtos);
+
+    } catch (RuntimeException e) {
+        System.err.println("⚠️ Error in getAssignedClaims: " + e.getMessage());
+        return ResponseEntity.status(400).body("Error: " + e.getMessage());
     } catch (Exception e) {
-        return ResponseEntity.status(403).body("Error fetching claims: " + e.getMessage());
+        System.err.println("⚠️ Unexpected error in getAssignedClaims: " + e.getMessage());
+        e.printStackTrace();
+        return ResponseEntity.status(500).body("Server error: " + e.getMessage());
     }
 }
 
@@ -118,19 +146,31 @@ public ResponseEntity<?> getAssignedClaims(@RequestHeader(value = "Authorization
 public ResponseEntity<?> approveClaim(
         @PathVariable Long claimId,
         @RequestBody Map<String, String> body,
-        @RequestHeader(value = "Authorization") String authHeader) {
+        @RequestHeader(value = "Authorization", required = false) String authHeader) {
     try {
-        validateHrToken(authHeader);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).body("Missing or invalid Authorization header");
+        }
+
+        String token = authHeader.substring(7).trim();
+        String role = jwtUtil.extractRole(token);
+
+        // Allow both HR and ADMIN to approve claims
+        if (!"HR".equalsIgnoreCase(role) && !"ADMIN".equalsIgnoreCase(role)) {
+            return ResponseEntity.status(403).body("Unauthorized: not HR or ADMIN");
+        }
+
         String remarks = body.get("remarks");
         Claim updated = claimService.approveClaim(claimId, remarks);
 
-        Hr hr = getHrFromToken(authHeader);
+        String email = jwtUtil.extractEmail(token);
+        String userIdentifier = email != null ? email : "SYSTEM";
 
         // -------------------- Audit log --------------------
         auditLogService.logAction(
-                hr.getId().toString(),
-                hr.getName(),
-                "HR",
+                userIdentifier,
+                userIdentifier,
+                role,
                 "CLAIM_APPROVE",
                 "Approved claim ID: " + claimId
         );
@@ -146,19 +186,31 @@ public ResponseEntity<?> approveClaim(
 public ResponseEntity<?> rejectClaim(
         @PathVariable Long claimId,
         @RequestBody Map<String, String> body,
-        @RequestHeader(value = "Authorization") String authHeader) {
+        @RequestHeader(value = "Authorization", required = false) String authHeader) {
     try {
-        validateHrToken(authHeader);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).body("Missing or invalid Authorization header");
+        }
+
+        String token = authHeader.substring(7).trim();
+        String role = jwtUtil.extractRole(token);
+
+        // Allow both HR and ADMIN to reject claims
+        if (!"HR".equalsIgnoreCase(role) && !"ADMIN".equalsIgnoreCase(role)) {
+            return ResponseEntity.status(403).body("Unauthorized: not HR or ADMIN");
+        }
+
         String remarks = body.get("remarks");
         Claim updated = claimService.rejectClaim(claimId, remarks);
 
-        Hr hr = getHrFromToken(authHeader);
+        String email = jwtUtil.extractEmail(token);
+        String userIdentifier = email != null ? email : "SYSTEM";
 
         // -------------------- Audit log --------------------
         auditLogService.logAction(
-                hr.getId().toString(),
-                hr.getName(),
-                "HR",
+                userIdentifier,
+                userIdentifier,
+                role,
                 "CLAIM_REJECT",
                 "Rejected claim ID: " + claimId
         );

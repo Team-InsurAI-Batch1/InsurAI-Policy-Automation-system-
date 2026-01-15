@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -120,7 +121,27 @@ public class ClaimService {
     
     @Transactional(readOnly = true)
     public List<Claim> getClaimsByEmployee(Employee employee) {
-        return claimRepository.findByEmployee(employee);
+        List<Claim> claims = claimRepository.findByEmployee(employee);
+        // Initialize lazy collections while the transactional session is open
+        for (Claim c : claims) {
+            if (c.getDocuments() != null) {
+                c.getDocuments().size();
+            }
+            // Initialize associations used by DTO mapping
+            if (c.getEmployee() != null) {
+                c.getEmployee().getId();
+                c.getEmployee().getName();
+            }
+            if (c.getPolicy() != null) {
+                c.getPolicy().getId();
+                c.getPolicy().getPolicyName();
+            }
+            if (c.getAssignedHr() != null) {
+                c.getAssignedHr().getId();
+                c.getAssignedHr().getName();
+            }
+        }
+        return claims;
     }
 
     public List<Claim> getClaimsByEmployeeId(String employeeId) {
@@ -134,13 +155,34 @@ public class ClaimService {
         claimRepository.saveAll(claims);
     }
 
+    @Transactional(readOnly = true)
     public List<Claim> getAllClaims() {
-        return claimRepository.findAll();
+        List<Claim> claims = claimRepository.findAll();
+        for (Claim c : claims) {
+            if (c.getDocuments() != null) {
+                c.getDocuments().size();
+            }
+            // Initialize associations used by AdminController.ClaimDTO mapping
+            if (c.getEmployee() != null) {
+                c.getEmployee().getId();
+                c.getEmployee().getName();
+            }
+            if (c.getPolicy() != null) {
+                c.getPolicy().getId();
+                c.getPolicy().getPolicyName();
+            }
+            if (c.getAssignedHr() != null) {
+                c.getAssignedHr().getId();
+                c.getAssignedHr().getName();
+            }
+        }
+        return claims;
     }
 
     /**
-     * Approve a claim and send professional email + in-app notification
+     * Approve a claim (Fast - notifications sent async)
      */
+    @Transactional
     public Claim approveClaim(Long claimId, String remarks) throws Exception {
         Claim claim = claimRepository.findByIdWithEmployee(claimId)
                 .orElseThrow(() -> new Exception("Claim not found"));
@@ -150,7 +192,7 @@ public class ClaimService {
         claim.setUpdatedAt(LocalDateTime.now());
         Claim updatedClaim = claimRepository.save(claim);
 
-        // Email notification
+        // Email notification - TEMPORARY: back to sync for debugging
         if (updatedClaim.getEmployee() != null && updatedClaim.getEmployee().getEmail() != null) {
             try {
                 notificationService.sendClaimStatusEmail(updatedClaim.getEmployee().getEmail(), updatedClaim);
@@ -162,12 +204,26 @@ public class ClaimService {
         // In-app notification
         inAppNotificationService.createClaimApprovedNotification(updatedClaim);
 
+        // Eagerly initialize relationships for DTO mapping
+        if (updatedClaim.getDocuments() != null) {
+            updatedClaim.getDocuments().size();
+        }
+        if (updatedClaim.getPolicy() != null) {
+            updatedClaim.getPolicy().getId();
+            updatedClaim.getPolicy().getPolicyName();
+        }
+        if (updatedClaim.getAssignedHr() != null) {
+            updatedClaim.getAssignedHr().getId();
+            updatedClaim.getAssignedHr().getName();
+        }
+
         return updatedClaim;
     }
 
     /**
-     * Reject a claim and send professional email + in-app notification
+     * Reject a claim (Fast - notifications sent async)
      */
+    @Transactional
     public Claim rejectClaim(Long claimId, String remarks) throws Exception {
         Claim claim = claimRepository.findByIdWithEmployee(claimId)
                 .orElseThrow(() -> new Exception("Claim not found"));
@@ -177,7 +233,7 @@ public class ClaimService {
         claim.setUpdatedAt(LocalDateTime.now());
         Claim updatedClaim = claimRepository.save(claim);
 
-        // Email notification
+        // Email notification - TEMPORARY: back to sync for debugging
         if (updatedClaim.getEmployee() != null && updatedClaim.getEmployee().getEmail() != null) {
             try {
                 notificationService.sendClaimStatusEmail(updatedClaim.getEmployee().getEmail(), updatedClaim);
@@ -188,6 +244,19 @@ public class ClaimService {
 
         // In-app notification
         inAppNotificationService.createClaimRejectedNotification(updatedClaim);
+
+        // Eagerly initialize relationships for DTO mapping
+        if (updatedClaim.getDocuments() != null) {
+            updatedClaim.getDocuments().size();
+        }
+        if (updatedClaim.getPolicy() != null) {
+            updatedClaim.getPolicy().getId();
+            updatedClaim.getPolicy().getPolicyName();
+        }
+        if (updatedClaim.getAssignedHr() != null) {
+            updatedClaim.getAssignedHr().getId();
+            updatedClaim.getAssignedHr().getName();
+        }
 
         return updatedClaim;
     }
@@ -204,12 +273,51 @@ public class ClaimService {
         return claimRepository.findByEmployee_EmployeeIdAndStatus(employeeId, status);
     }
 
+    @Transactional(readOnly = true)
     public List<Claim> getClaimsByAssignedHr(Long hrId) {
-        return claimRepository.findByAssignedHrId(hrId);
+        List<Claim> claims = claimRepository.findByAssignedHr_Id(hrId);
+        // Initialize lazy collections while the transactional session is open
+        for (Claim c : claims) {
+            if (c.getDocuments() != null) {
+                c.getDocuments().size();
+            }
+            if (c.getEmployee() != null) {
+                c.getEmployee().getId();
+                c.getEmployee().getName();
+            }
+            if (c.getPolicy() != null) {
+                c.getPolicy().getId();
+                c.getPolicy().getPolicyName();
+            }
+            if (c.getAssignedHr() != null) {
+                c.getAssignedHr().getId();
+                c.getAssignedHr().getName();
+            }
+        }
+        return claims;
     }
 
+    @Transactional(readOnly = true)
     public Claim getClaimById(Long claimId) {
-        return claimRepository.findById(claimId).orElse(null);
+        Claim claim = claimRepository.findById(claimId).orElse(null);
+        if (claim != null) {
+            if (claim.getDocuments() != null) {
+                claim.getDocuments().size();
+            }
+            if (claim.getEmployee() != null) {
+                claim.getEmployee().getId();
+                claim.getEmployee().getName();
+            }
+            if (claim.getPolicy() != null) {
+                claim.getPolicy().getId();
+                claim.getPolicy().getPolicyName();
+            }
+            if (claim.getAssignedHr() != null) {
+                claim.getAssignedHr().getId();
+                claim.getAssignedHr().getName();
+            }
+        }
+        return claim;
     }
 
     public Claim updateClaim(Claim claim) throws Exception {
@@ -226,6 +334,6 @@ public class ClaimService {
     }
 
     public List<Claim> getFraudClaimsByAssignedHr(Long hrId) {
-        return claimRepository.findByAssignedHrIdAndFraudFlag(hrId, true);
+        return claimRepository.findByAssignedHr_IdAndFraudFlag(hrId, true);
     }
 }
