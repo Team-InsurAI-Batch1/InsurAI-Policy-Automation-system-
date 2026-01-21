@@ -343,6 +343,13 @@ https://drive.google.com/drive/folders/1PpRvgcAbskYgv3I545NkfslyLUSdWW0t?usp=dri
 
 ## 🚀 Deployment & Hosting
 
+<p align="center">
+  🚀✨ <strong>LIVE APPLICATION</strong> ✨🚀 <br><br>
+  🔗 <a href="https://insurai-automation-system.netlify.app/#/" target="_blank">
+    <strong>Click Here to Access InsurAI</strong>
+  </a>
+</p>
+
 ### ✅ Deployment Status: **Successfully Deployed**
 
 The InsurAI application has been **successfully deployed as a full-stack cloud-based system** using modern hosting platforms. The deployment follows industry-standard separation of concerns for frontend, backend, and database layers.
@@ -432,9 +439,10 @@ GITHUB LINK:https://github.com/Team-InsurAI-Batch1
 ---
 
 DEPLOYMENT SCREENSHOTS
-<img width="1908" height="975" alt="image" src="https://github.com/user-attachments/assets/6fe45813-4312-41df-96a1-a05ccf52e2bd" />
-<img width="1368" height="651" alt="image" src="https://github.com/user-attachments/assets/2c65f14f-76eb-4247-a3c3-4db2851e4ff8" />
-<img width="1375" height="656" alt="image" src="https://github.com/user-attachments/assets/df027497-5ea8-4afa-831e-dad291bdbca1" />
+<img width="1919" height="877" alt="Screenshot 2026-01-21 212429" src="https://github.com/user-attachments/assets/81d1b9f6-3c7a-4c73-a32a-dc12ff84d871" />
+<img width="1368" height="651" alt="Screenshot 2026-01-21 211310" src="https://github.com/user-attachments/assets/34550941-3bc0-4f65-aac4-a9b71bc56045" />
+<img width="1375" height="656" alt="Screenshot 2026-01-21 211331" src="https://github.com/user-attachments/assets/3f0840ad-e672-435b-b818-08a0dd76f1e4" />
+
 
 ### 📌 Submission Note
 
