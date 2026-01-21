@@ -179,8 +179,8 @@ public class AuthController {
         emp.setResetTokenExpiry(LocalDateTime.now().plusMinutes(30));
         employeeRepository.save(emp);
 
-        String resetLink =
-                "https://insurai-automation-system.netlify.app/reset-password/" + resetToken;
+        String resetLink = "https://insurai-automation-system.netlify.app/#/employee/reset-password/" + resetToken;
+
 
         // ✅ Send reset email via SendGrid
         emailService.sendResetPasswordEmail(
