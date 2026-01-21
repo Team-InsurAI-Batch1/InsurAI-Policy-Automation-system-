@@ -439,8 +439,12 @@ GITHUB LINK:https://github.com/Team-InsurAI-Batch1
 ---
 
 DEPLOYMENT SCREENSHOTS
-<img width="1919" height="877" alt="Screenshot 2026-01-21 212429" src="https://github.com/user-attachments/assets/81d1b9f6-3c7a-4c73-a32a-dc12ff84d871" />
+<img width="1908" height="975" alt="Screenshot 2026-01-21 211247" src="https://github.com/user-attachments/assets/199689d3-1377-454a-9244-710b2cd8429e" />
+
+
 <img width="1368" height="651" alt="Screenshot 2026-01-21 211310" src="https://github.com/user-attachments/assets/34550941-3bc0-4f65-aac4-a9b71bc56045" />
+
+
 <img width="1375" height="656" alt="Screenshot 2026-01-21 211331" src="https://github.com/user-attachments/assets/3f0840ad-e672-435b-b818-08a0dd76f1e4" />
 
 
