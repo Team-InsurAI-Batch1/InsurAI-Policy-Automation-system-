@@ -448,6 +448,10 @@ DEPLOYMENT SCREENSHOTS
 <img width="1375" height="656" alt="Screenshot 2026-01-21 211331" src="https://github.com/user-attachments/assets/3f0840ad-e672-435b-b818-08a0dd76f1e4" />
 
 
+<img width="1919" height="828" alt="image" src="https://github.com/user-attachments/assets/55777135-4d35-4977-966e-de4810eb58a2" />
+
+
+
 ### 📌 Submission Note
 
 The project is being submitted as part of the **Infosys Springboard – Java Tech Stack Virtual Internship**, with:
