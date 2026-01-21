@@ -5,6 +5,12 @@
 InsurAI is a full-stack corporate insurance management and automation system designed to streamline policy administration, employee claims, agent interactions, fraud detection, and intelligent assistance. The application is built using **React (Frontend)** and **Spring Boot (Backend)** with secure authentication, role-based access, and AI-powered features.
 
 ---
+<p align="center">
+  🚀✨ <strong>LIVE APPLICATION</strong> ✨🚀 <br><br>
+  🔗 <a href="https://insurai-automation-system.netlify.app/#/" target="_blank">
+    <strong>Click Here to Access InsurAI</strong>
+  </a>
+</p>
 
 ## 📌 Project Overview
 
